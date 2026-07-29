@@ -11,26 +11,29 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
+    # Django Admin
     path("admin/", admin.site.urls),
 
     # API
-    path("api/", include("books.urls")),
+    path("api/books/", include("books.urls")),
+    path("api/borrowings/", include("borrowings.urls")),
+    path("api/payments/", include("payments.urls")),
 
-    # OpenAPI
+    # OpenAPI Schema
     path(
         "api/schema/",
         SpectacularAPIView.as_view(),
         name="schema",
     ),
 
-    # Swagger
+    # Swagger UI
     path(
         "api/docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
 
-    # JWT
+    # JWT Authentication
     path(
         "api/users/token/",
         TokenObtainPairView.as_view(),

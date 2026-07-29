@@ -1,8 +1,8 @@
 from rest_framework.routers import DefaultRouter
 
-from books.views import BookViewSet
+from payments.views import PaymentViewSet
 
 router = DefaultRouter()
-router.register("", BookViewSet, basename="book")
+router.register("", PaymentViewSet, basename="payment")
 
 urlpatterns = router.urls
