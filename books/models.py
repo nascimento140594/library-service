@@ -13,6 +13,7 @@ class Book(models.Model):
         choices=CoverChoices.choices,
     )
     inventory = models.PositiveIntegerField()
+    borrowed = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ["title"]

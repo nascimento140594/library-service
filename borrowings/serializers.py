@@ -22,10 +22,11 @@ class BorrowingSerializer(serializers.ModelSerializer):
         )
 
     def validate_book(self, value):
-        if self.instance is None and value.inventory <= 0:
+        if self.instance is None and value.borrowed >= value.inventory:
             raise serializers.ValidationError(
                 "This book is out of stock."
             )
+
         return value
 
     def validate(self, attrs):
@@ -35,8 +36,12 @@ class BorrowingSerializer(serializers.ModelSerializer):
             else attrs.get("borrow_date")
         )
 
-        expected_return_date = attrs.get("expected_return_date")
-        actual_return_date = attrs.get("actual_return_date")
+        expected_return_date = attrs.get(
+            "expected_return_date"
+        )
+        actual_return_date = attrs.get(
+            "actual_return_date"
+        )
 
         if (
             expected_return_date
@@ -71,13 +76,17 @@ class BorrowingSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         book = validated_data["book"]
 
-        book.inventory -= 1
+        book.borrowed += 1
         book.save()
 
-        return Borrowing.objects.create(**validated_data)
+        return Borrowing.objects.create(
+            **validated_data
+        )
 
     def update(self, instance, validated_data):
-        actual_return_date = validated_data.get("actual_return_date")
+        actual_return_date = validated_data.get(
+            "actual_return_date"
+        )
 
         if (
             actual_return_date
@@ -96,7 +105,12 @@ class BorrowingSerializer(serializers.ModelSerializer):
             and instance.actual_return_date is None
         ):
             book = instance.book
-            book.inventory += 1
-            book.save()
 
-        return super().update(instance, validated_data)
+            if book.borrowed > 0:
+                book.borrowed -= 1
+                book.save()
+
+        return super().update(
+            instance,
+            validated_data,
+        )
